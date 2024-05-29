@@ -1,0 +1,73 @@
+# Reference: <https://postmarketos.org/vendorkernel>
+# Kernel config based on: arch/arm64/configs/(CHANGEME!)
+
+pkgname=linux-htc-hima
+pkgver=3.10.84
+pkgrel=11
+pkgdesc="HTC One M9 kernel fork"
+arch="aarch64"
+_carch="arm64"
+_flavor="htc-hima"
+url="https://kernel.org"
+license="GPL-2.0-only"
+options="!strip !check !tracedeps pmb:cross-native"
+makedepends="
+	bash
+	bc
+	bison
+	devicepkg-dev
+	findutils
+	flex
+	openssl-dev
+	perl
+	linux-headers
+	gcc6
+"
+# Compiler: GCC 6 (doesn't boot when compiled with newer versions)
+#if [ "${CC:0:5}" != "gcc6-" ]; then
+	CC="gcc6-$CC"
+	HOSTCC="gcc6-gcc"
+	CROSS_COMPILE="gcc6-$CROSS_COMPILE"
+#fi
+# Source
+_repository="android_kernel_htc_msm8994"
+_commit="5154b9e05b918145496c077899495692e678a6e2"
+_config="config-$_flavor.$arch"
+source="
+	$pkgname-$_commit.tar.gz::https://github.com/LineageOS/$_repository/archive/$_commit.tar.gz
+	$_config
+	gcc7-give-up-on-ilog2-const-optimizations.patch
+	gcc8-fix-put-user.patch
+	gcc10-extern_YYLOC_global_declaration.patch
+	linux3.4-ARM-8933-1-replace-Sun-Solaris-style-flag-on-section.patch
+	place-cpu_setup-in-text.patch
+"
+builddir="$srcdir/$_repository-$_commit"
+_outdir="out"
+
+
+prepare() {
+	default_prepare
+	. downstreamkernel_prepare
+}
+
+build() {
+	unset LDFLAGS
+	make O="$_outdir" ARCH="$_carch" CC="${CC:-gcc}" \
+		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-postmarketOS"
+}
+
+package() {
+	downstreamkernel_package "$builddir" "$pkgdir" "$_carch" \
+		"$_flavor" "$_outdir"
+}
+
+sha512sums="
+cef8d28a357be7924ce5c4baaeb6a474535c9a7e4e50e821959414abf1999594eab0199a4626fc376286777d5b6709ea57f328db514b0cdd1f81fd697c68c98c  linux-htc-hima-5154b9e05b918145496c077899495692e678a6e2.tar.gz
+6b138710b3a9c1dc41dc67068a7fa80e87f7c2bd175230267b475a0c2d1c1967fe15708a7a87b3200e0036da843aab2c13974f0f2d4cc542972de53219c3bfb7  config-htc-hima.aarch64
+77eba606a71eafb36c32e9c5fe5e77f5e4746caac292440d9fb720763d766074a964db1c12bc76fe583c5d1a5c864219c59941f5e53adad182dbc70bf2bc14a7  gcc7-give-up-on-ilog2-const-optimizations.patch
+197d40a214ada87fcb2dfc0ae4911704b9a93354b75179cd6b4aadbb627a37ec262cf516921c84a8b1806809b70a7b440cdc8310a4a55fca5d2c0baa988e3967  gcc8-fix-put-user.patch
+2b48f1bf0e3f70703d2cdafc47d5e615cc7c56c70bec56b2e3297d3fa4a7a1321d649a8679614553dde8fe52ff1051dae38d5990e3744c9ca986d92187dcdbeb  gcc10-extern_YYLOC_global_declaration.patch
+b14c0033045dd1ec5dd03612d8fb6361c4a0fa3eb54f7e262628d18756456c2e569a437d1b35099a8302577d1e471bbf9222b4b1b30f6578af7e4342a0009815  linux3.4-ARM-8933-1-replace-Sun-Solaris-style-flag-on-section.patch
+ef361f4729efeb6442bdd028798a3ba8f34901cbcbedc318ae0788e23e7c897897587cee82f334d2ec5d7954a73d409bd25f1742d53ba704dd2b672a5de80f26  place-cpu_setup-in-text.patch
+"
