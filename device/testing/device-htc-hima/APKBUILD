@@ -2,7 +2,7 @@
 pkgname=device-htc-hima
 pkgdesc="HTC One M9"
 pkgver=1
-pkgrel=8
+pkgrel=10
 url="https://postmarketos.org"
 license="MIT"
 arch="aarch64"
@@ -18,6 +18,7 @@ source="
 	deviceinfo
 	modules-initfs
 	10-logind-check-graphical.conf
+	etc-NetworkManager-conf.d-wlan0-preserve-mac.conf
 "
 
 subpackages="
@@ -33,6 +34,7 @@ package() {
 
 	install -Dm644 "$srcdir"/10-logind-check-graphical.conf \
 		-t "$pkgdir"/usr/share/lightdm/lightdm.conf.d
+	install -Dm644 etc-NetworkManager-conf.d-wlan0-preserve-mac.conf "$pkgdir"/etc/NetworkManager/conf.d/wlan0-preserve-mac.conf
 }
 
 nonfree_firmware() {
@@ -45,4 +47,5 @@ sha512sums="
 62568fb9860aa24eed6ad01b44351b7859cc08b66cbffb1ccc2d35c3425149062c8048d902c0c00f1fa66fc04c424f87b13a9167dd872b00066dd34d1640a1c2  deviceinfo
 e70bae17df23dcaaaea0e2d3616556f04baa23f8ee1357785c0f539bf97282d8ddff53953e155b72689bb73beb38c2da3d08de2a61e866684edfa10a6593885d  modules-initfs
 00addbea452dd3e2cb90e18793becc47d22118e6b99a79b76eb57db02aa8b00b133569beaea81cce4b39c9e556280c1d6ac8ab687016354e2d189734e38768cf  10-logind-check-graphical.conf
+32c8fd2b16980da3d43e20721efe5b5cdc130cd0ed67bc14e393a09d3132c5cd6886bd04056d7bf4967c07e6a4343324334ba1b8d2178dc35936b7126bbc46c9  etc-NetworkManager-conf.d-wlan0-preserve-mac.conf
 "

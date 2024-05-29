@@ -3,7 +3,7 @@
 
 pkgname=linux-htc-hima
 pkgver=3.10.84
-pkgrel=11
+pkgrel=13
 pkgdesc="HTC One M9 kernel fork"
 arch="aarch64"
 _carch="arm64"
